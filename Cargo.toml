@@ -16,11 +16,12 @@ crate-type = ["cdylib", "rlib", "staticlib"]
 
 
 [dependencies]
-halo2_gadgets = { git = "https://github.com/zkonduit/halo2" }
+# Local patched halo2 with RNS GPU acceleration
+halo2_gadgets = { path = "/home/alex/Projects/halo2-rns/halo2_gadgets" }
 halo2curves = { git = "https://github.com/privacy-scaling-explorations/halo2curves", rev = "b753a832e92d5c86c5c997327a9cf9de86a18851", features = [
     "derive_serde",
 ] }
-halo2_proofs = { git = "https://github.com/zkonduit/halo2", package = "halo2_proofs", features = [
+halo2_proofs = { path = "/home/alex/Projects/halo2-rns/halo2_proofs", package = "halo2_proofs", features = [
     "circuit-params",
 ] }
 rand = { version = "0.8", default-features = false }
@@ -37,6 +38,7 @@ snark-verifier = { git = "https://github.com/zkonduit/snark-verifier", branch = 
 ] }
 halo2_solidity_verifier = { git = "https://github.com/alexander-camuto/halo2-solidity-verifier", optional = true }
 maybe-rayon = { version = "0.1.1", default-features = false }
+mct-core = { path = "../zk-proofs/crates/mct-core", optional = true }
 bincode = { version = "1.3.3", default-features = false }
 unzip-n = "0.1.2"
 num = "0.4.1"
@@ -269,14 +271,22 @@ asm = ["halo2curves/asm", "halo2_proofs/asm"]
 precompute-coset = ["halo2_proofs/precompute-coset"]
 det-prove = []
 icicle = ["halo2_proofs/icicle_gpu"]
+rns-gpu = ["halo2_proofs/rns_gpu"]
 empty-cmd = []
 no-banner = []
 no-update = []
 macos-metal = ["halo2_proofs/macos"]
 ios-metal = ["halo2_proofs/ios"]
+mct-scheduling = ["dep:mct-core"]
 
 [patch.crates-io]
 uniffi_testing = { git = "https://github.com/ElusAegis/uniffi-rs", branch = "feat/testing-feature-build-fix" }
+
+# Override zkonduit/halo2 with our RNS GPU accelerated version
+[patch."https://github.com/zkonduit/halo2"]
+halo2_proofs = { path = "/home/alex/Projects/halo2-rns/halo2_proofs" }
+halo2_gadgets = { path = "/home/alex/Projects/halo2-rns/halo2_gadgets" }
+halo2 = { path = "/home/alex/Projects/halo2-rns/halo2" }
 
 [profile.release]
 rustflags = ["-C", "relocation-model=pic"]
